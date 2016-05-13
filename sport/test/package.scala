@@ -9,14 +9,15 @@ import java.util
 
 import football.controllers.HealthCheck
 import org.scalatest.Suites
-import play.api.libs.ws.ning.NingWSResponse
-import recorder.HttpRecorder
+import recorder.{WsHttpRecorder, HttpRecorder}
 import play.api.libs.ws.{WS, WSResponse}
 import conf.FootballClient
 import pa.{Http, Response => PaResponse}
 import play.api.Play.current
 
 import scala.concurrent.Future
+import scala.concurrent.duration._
+import scala.io.Source
 
 class SportTestSuite extends Suites (
   new CompetitionListControllerTest,
@@ -67,19 +68,8 @@ private case class Resp(getResponseBody: String) extends com.ning.http.client.Re
   def hasResponseBody: Boolean = throw new NotImplementedError()
 }
 
-object FeedHttpRecorder extends HttpRecorder[WSResponse] {
-
+object FeedHttpRecorder extends HttpRecorder[WSResponse] with WsHttpRecorder[WSResponse] {
   override lazy val baseDir = new File(System.getProperty("user.dir"), "data/sportfeed")
-
-  def toResponse(str: String) = NingWSResponse(Resp(str))
-
-  def fromResponse(response: WSResponse) = {
-    if (response.status == 200) {
-      response.body
-    } else {
-      s"Error:${response.status}"
-    }
-  }
 }
 
 // Stubs data for Football stats integration tests
@@ -88,7 +78,7 @@ object TestHttp extends Http with ExecutionContexts {
   def GET(url: String): Future[PaResponse] = {
     FootballHttpRecorder.load(url) {
       WS.url(url)
-        .withRequestTimeout(10000)
+        .withRequestTimeout(10.seconds)
         .get()
         .map { wsResponse =>
           pa.Response(wsResponse.status, wsResponse.body, wsResponse.statusText)

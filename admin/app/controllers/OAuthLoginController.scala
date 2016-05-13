@@ -29,6 +29,7 @@ class OAuthLoginController extends Controller with ExecutionContexts {
     val host = Some(s"${if (request.secure) "https" else "http"}://${request.host}")
     conf.GoogleAuth(host).config.map { config =>
       val antiForgeryToken = GoogleAuth.generateAntiForgeryToken()
+      implicit val ws = wsClient
       GoogleAuth.redirectToGoogle(config, antiForgeryToken).map {
         _.withSession {
           request.session + (ANTI_FORGERY_KEY -> antiForgeryToken)
@@ -52,6 +53,7 @@ class OAuthLoginController extends Controller with ExecutionContexts {
             .flashing("error" -> "Anti forgery token missing in session")
           )
         case Some(token) =>
+          implicit val ws = wsClient
           GoogleAuth.validatedUserIdentity(config, token).map {
             userIdentity: UserIdentity =>
               // We store the URL a user was trying to get to in the LOGIN_ORIGIN_KEY inAuthActions.AuthActionTest

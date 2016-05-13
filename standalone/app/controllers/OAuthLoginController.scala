@@ -40,6 +40,7 @@ class OAuthLoginController extends Controller with ExecutionContexts with implic
   def loginAction = Action.async { implicit request =>
     googleAuthConfig.flatMap(overrideRedirectUrl).map(checkIsSecure).map { config =>
       val antiForgeryToken = GoogleAuth.generateAntiForgeryToken()
+      implicit val ws = wsClient
       GoogleAuth.redirectToGoogle(config, antiForgeryToken).map {
         _.withSession {
           request.session + (ANTI_FORGERY_KEY -> antiForgeryToken)
@@ -82,6 +83,7 @@ class OAuthLoginController extends Controller with ExecutionContexts with implic
             .flashing("error" -> "Anti forgery token missing in session")
           )
         case Some(token) =>
+          implicit val ws = wsClient
           GoogleAuth.validatedUserIdentity(config, token).map { userIdentity: UserIdentity =>
             // We store the URL a user was trying to get to in the LOGIN_ORIGIN_KEY in AuthAction
             // Redirect a user back there now if it exists

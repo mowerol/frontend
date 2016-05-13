@@ -14,6 +14,7 @@ import play.api.mvc.{Action, Cookie, RequestHeader, Result}
 import play.filters.csrf.{CSRFConfig, CSRFAddToken, CSRFCheck}
 
 import scala.concurrent.Future
+import scala.concurrent.duration._
 import scala.util.control.NonFatal
 
 class CommentsController(csrfConfig: CSRFConfig) extends DiscussionController with ExecutionContexts {
@@ -108,7 +109,7 @@ class CommentsController(csrfConfig: CSRFConfig) extends DiscussionController wi
     val url = s"${conf.Configuration.discussion.apiRoot}/comment/${abuseReport.commentId}/reportAbuse"
     val headers = Seq("D2-X-UID" -> conf.Configuration.discussion.d2Uid, "GU-Client" -> conf.Configuration.discussion.apiClientHeader)
     if (cookie.isDefined) { headers :+  ("Cookie"->s"SC_GU_U=${cookie.get}") }
-    WS.url(url).withHeaders(headers: _*).withRequestTimeout(2000).post(abuseReportToMap(abuseReport))
+    WS.url(url).withHeaders(headers: _*).withRequestTimeout(2.seconds).post(abuseReportToMap(abuseReport))
 
   }
 
