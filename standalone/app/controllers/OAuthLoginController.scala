@@ -6,12 +6,12 @@ import conf.Configuration
 import org.joda.time.DateTime
 import play.api.libs.Crypto
 import play.api.libs.json.Json
+import play.api.libs.ws.WSClient
 import play.api.mvc.{Cookie, RequestHeader, Action, Controller}
 import scala.concurrent.Future
 import conf.Configuration.environment.projectName
 
-class OAuthLoginController extends Controller with ExecutionContexts with implicits.Requests {
-  import play.api.Play.current
+class OAuthLoginController(wsClient: WSClient) extends Controller with ExecutionContexts with implicits.Requests {
 
   val LOGIN_ORIGIN_KEY = "loginOriginUrl"
   val ANTI_FORGERY_KEY = "antiForgeryToken"
