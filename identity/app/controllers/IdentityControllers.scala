@@ -5,9 +5,12 @@ import com.softwaremill.macwire._
 import form.FormComponents
 import formstack.FormStackComponents
 import idapiclient.IdApiComponents
+import play.filters.csrf.CSRFCheck
 import services.IdentityServices
 
 trait IdentityControllers extends IdApiComponents with IdentityServices with FormStackComponents with FormComponents {
+
+  def csrfCheck: CSRFCheck
 
   lazy val authenticatedActions = wire[AuthenticatedActions]
 
