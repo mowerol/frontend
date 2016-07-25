@@ -25,7 +25,7 @@ define([
     'common/modules/commercial/user-ad-targeting',
     'common/modules/commercial/donot-use-adblock',
     'common/modules/commercial/user-features',
-    'common/modules/discussion/comment-count',
+    'common/modules/discussion/comment-count-widget',
     'common/modules/identity/autosignin',
     'common/modules/identity/cookierefresh',
     'common/modules/navigation/navigation',
@@ -79,7 +79,7 @@ define([
     userAdTargeting,
     donotUseAdblock,
     userFeatures,
-    CommentCount,
+    CommentCountWidget,
     AutoSignin,
     CookieRefresh,
     navigation,
@@ -247,7 +247,7 @@ define([
 
             initDiscussion: function () {
                 if (config.switches.discussion) {
-                    CommentCount.init();
+                    CommentCountWidget.init();
                 }
             },
 
